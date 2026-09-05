@@ -22,6 +22,7 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm run check:export
+      - run: node scripts/verify-seo.mjs
       - run: npx tsc --noEmit
       - run: node scripts/verify-hostinger-app.mjs
       - name: Update the ready-to-deploy branch

@@ -1,0 +1,55 @@
+import assert from 'node:assert/strict';
+import { readFile, access } from 'node:fs/promises';
+import path from 'node:path';
+const root = path.resolve('dist/client');
+const origin = 'https://shipuntildead.com';
+const sitemap = await readFile(path.join(root, 'sitemap.xml'), 'utf8');
+const urls = [...sitemap.matchAll(/<loc>(.*?)<\/loc>/g)].map(match => match[1]);
+assert.equal(urls.length, 4);
+assert.equal(new Set(urls).size, urls.length);
+const titles = new Set();
+const descriptions = new Set();
+for (const url of urls) {
+  assert.ok(url.startsWith(origin + '/') && url.endsWith('/'));
+  const pathname = new URL(url).pathname;
+  const html = await readFile(path.join(root, pathname, 'index.html'), 'utf8');
+  const head = html.split('</head>')[0];
+  const tags = [...head.matchAll(/<(?:meta|link)\s[^>]*>/g)].map(match => Object.fromEntries([...match[0].matchAll(/([\w:-]+)="([^"]*)"/g)].map(attr => [attr[1], attr[2]])));
+  const meta = name => tags.filter(tag => tag.name === name || tag.property === name);
+  const title = head.match(/<title>(.*?)<\/title>/)?.[1];
+  assert.ok(title?.includes('ShipUntilDead'), url);
+  titles.add(title);
+  assert.equal(meta('description').length, 1, url + ' single description');
+  const description = meta('description')[0].content;
+  assert.ok(description.length > 80 && description.length < 200);
+  descriptions.add(description);
+  assert.deepEqual(tags.filter(tag => tag.rel === 'canonical').map(tag => new URL(tag.href).href), [url]);
+  assert.equal(new URL(meta('og:url')[0]?.content).href, url);
+  assert.equal(meta('og:title')[0]?.content, title);
+  assert.equal(meta('twitter:card')[0]?.content, 'summary_large_image');
+  for (const name of ['robots', 'googlebot']) assert.ok(meta(name).every(tag => !/noindex|nofollow|nosnippet/.test(tag.content)), url);
+  const image = meta('og:image')[0]?.content;
+  assert.ok(image?.startsWith(origin + '/images/social-'));
+  const png = await readFile(path.join(root, new URL(image).pathname));
+  assert.equal(png.readUInt32BE(16), 1200);
+  assert.equal(png.readUInt32BE(20), 630);
+  const graphs = [...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g)].map(match => JSON.parse(match[1]));
+  const entities = graphs.flatMap(graph => graph['@graph'] || [graph]);
+  const person = entities.find(entity => entity['@type'] === 'Person');
+  assert.equal(person?.name, 'Ashish Reddy');
+  for (const social of ['https://www.linkedin.com/in/ashish-reddy0/', 'https://x.com/Matarisva/']) {
+    assert.ok(person.sameAs.includes(social));
+    assert.ok(html.includes(`href="${social}"`));
+  }
+  assert.ok(entities.some(entity => entity['@type'] === 'WebSite'));
+  if (pathname !== '/') assert.ok(entities.some(entity => entity['@type'] === 'BreadcrumbList'));
+  assert.equal((html.match(/<h1(?:\s|>)/g) || []).length, 1);
+  console.log('PASS SEO metadata, canonical, social image, identity and visible social links: ' + pathname);
+}
+assert.equal(titles.size, 4);
+assert.equal(descriptions.size, 4);
+const robots = await readFile(path.join(root, 'robots.txt'), 'utf8');
+assert.match(robots, /User-agent: \*\nAllow: \/\n/);
+assert.ok(robots.includes('Sitemap: ' + origin + '/sitemap.xml'));
+for (const asset of ['favicon.svg','favicon-96.png','apple-touch-icon.png','images/logo.svg','images/logo-512.png']) await access(path.join(root, asset));
+console.log('PASS sitemap coverage, crawl permissions and favicon assets');

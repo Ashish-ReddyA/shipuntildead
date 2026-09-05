@@ -147,3 +147,13 @@ footer { border-top:3px solid var(--ink); display:flex; align-items:center; just
 .example-images figcaption p {font-size:16px;line-height:1.6;}
 .example-note {font-size:13px;line-height:1.7;color:var(--muted);max-width:100ch;margin-top:24px;}
 @media(max-width:650px) {.example-spread {padding:27px 0;}.example-images {grid-template-columns:1fr;gap:28px;}.example-heading>.yellow-note {display:none;}}
+.brand-logo {display:inline-block;width:40px;height:40px;flex-shrink:0;}
+.maker-mark .brand-logo {width:56px;height:56px;}
+.detail-brand {display:flex;align-items:center;gap:10px;}
+.detail-brand>span {margin-left:-10px;}
+.social-links {display:flex;flex-wrap:wrap;gap:12px 22px;font-size:14px;}
+.social-links a {color:var(--blue);border-bottom:1px solid var(--blue);gap:7px;padding:5px 0;}
+.social-links a:hover {background:var(--yellow);}
+.about-copy .social-links {margin-top:20px;}
+footer {flex-wrap:wrap;}
+@media(max-width:650px) {.detail-brand .brand-logo {width:32px;height:32px;} footer .social-links {justify-content:center;}}

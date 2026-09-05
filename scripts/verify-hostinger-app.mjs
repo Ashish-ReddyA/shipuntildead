@@ -22,6 +22,11 @@ for(const cwd of [root,path.join(root,'dist')]) {
   for(const route of ['/','/projects/give-ai-what-it-needs/','/projects/agent-arena/','/projects/agnys/','/images/give-ai-before.jpg','/images/give-ai-after.jpg']) assert.equal((await fetch(base+route)).status,200,route);
   for(const route of ['/package.json','/server.cjs','/missing','/%2e%2e%2fpackage.json']) assert.equal((await fetch(base+route)).status,404,route);
   assert.equal((await fetch(base+'/',{method:'HEAD'})).status,200);
+  for (const [route, type] of [['/robots.txt','text/plain'],['/sitemap.xml','application/xml'],['/favicon-96.png','image/png'],['/apple-touch-icon.png','image/png'],['/images/social-home.png','image/png']]) {
+   const response=await fetch(base+route);
+   assert.equal(response.status,200,route);
+   assert.ok(response.headers.get('content-type').startsWith(type),route);
+  }
   assert.equal((await fetch(base+'/',{method:'POST'})).status,405);
   console.log('PASS package build, public routes, blocked source files and assigned port: '+cwd);
  } finally { const exited=new Promise(resolve=>server.once('exit',resolve));server.kill();await exited; }

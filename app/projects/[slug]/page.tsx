@@ -3,12 +3,14 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, ArrowRight, ArrowUpRight } from 'lucide-react';
 import { getProject, projects } from '@/lib/projects';
+import { projectMetadata, projectGraph } from '@/lib/seo';
+import { BrandLogo, SocialLinks, StructuredData } from '@/components/site-identity';
 
 type Props = { params: Promise<{ slug: string }> };
 export function generateStaticParams() { return projects.map(({ slug }) => ({ slug })); }
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const project = getProject((await params).slug);
-  return project ? { title: `${project.name} — ShipUntilDead`, description: project.introduction } : { title: 'Project not found — ShipUntilDead' };
+  return project ? projectMetadata(project) : { title: 'Project not found — ShipUntilDead', robots: { index: false, follow: true } };
 }
 export default async function ProjectPage({ params }: Props) {
   const project = getProject((await params).slug);
@@ -16,9 +18,10 @@ export default async function ProjectPage({ params }: Props) {
   const nextProject = projects[(projects.indexOf(project) + 1) % projects.length];
   return (
     <div className={`publication project-publication ${project.className}`} id="top">
+      <StructuredData data={projectGraph(project)} />
       <a className="skip-link" href="#project-story">Skip to project details</a>
       <header className="detail-header">
-        <a href="/" className="detail-brand">ShipUntilDead<span>.</span></a>
+        <a href="/" className="detail-brand"><BrandLogo />ShipUntilDead<span>.</span></a>
         <nav aria-label="Main navigation"><a href="/#projects">Projects</a><a href="/#about">About</a><a href="https://github.com/Ashish-ReddyA" target="_blank" rel="noopener noreferrer">GitHub<ArrowUpRight size={15} /></a></nav>
       </header>
       <main id="project-story">
@@ -54,7 +57,7 @@ export default async function ProjectPage({ params }: Props) {
         </div>
         <div className="next-project"><span>Next on the shelf</span><a href={`/projects/${nextProject.slug}`}>{nextProject.name}<ArrowRight aria-hidden="true" /></a><a href="/#projects" className="back-to-collection">Back to the collection</a></div>
       </main>
-      <footer><a href="/" className="footer-brand">ShipUntilDead<ArrowUpRight size={19} aria-hidden="true" /></a><p>Built with curiosity. Published with intent.</p><span>© {new Date().getFullYear()} Ashish</span></footer>
+      <footer><a href="/" className="footer-brand"><BrandLogo />ShipUntilDead</a><SocialLinks /><span>© {new Date().getFullYear()} Ashish Reddy</span></footer>
     </div>
   );
 }
