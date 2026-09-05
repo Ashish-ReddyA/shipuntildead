@@ -1,0 +1,8 @@
+{
+  "name": "shipuntildead-hostinger",
+  "version": "1.0.0",
+  "private": true,
+  "engines": { "node": ">=22" },
+  "main": "server.cjs",
+  "scripts": { "build": "node build.cjs", "start": "node server.cjs" }
+}

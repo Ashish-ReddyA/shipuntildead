@@ -23,6 +23,7 @@ jobs:
       - run: npm run build
       - run: npm run check:export
       - run: npx tsc --noEmit
+      - run: node scripts/verify-hostinger-app.mjs
       - name: Update the ready-to-deploy branch
         shell: bash
         run: |
@@ -30,7 +31,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git worktree add "$RUNNER_TEMP/hostinger-site" origin/hostinger
-          rsync -a --delete --exclude='.git' --exclude='.vite' dist/client/ "$RUNNER_TEMP/hostinger-site/"
+          rsync -a --delete --exclude='.git' --exclude='.vite' --exclude='dist' dist/client/ "$RUNNER_TEMP/hostinger-site/"
           cd "$RUNNER_TEMP/hostinger-site"
           git add --all
           if git diff --cached --quiet; then
@@ -39,3 +40,4 @@ jobs:
             git commit -m "Build website from ${GITHUB_SHA}"
             git push origin HEAD:hostinger
           fi
+

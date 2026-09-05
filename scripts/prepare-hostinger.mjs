@@ -10,3 +10,8 @@ for (const file of await readdir(path.join(root, 'projects'))) {
 }
 await writeFile(path.join(root, '.htaccess'), 'DirectoryIndex index.html\nOptions -Indexes -MultiViews\nErrorDocument 404 /404.html\n');
 console.log('Hostinger files ready in dist/client.');
+
+// Hostinger's app importer expects a package even for prebuilt pages.
+for (const file of ['package.json','package-lock.json','build.cjs','server.cjs']) {
+  await copyFile(path.resolve('scripts/hostinger-app', file), path.join(root, file));
+}

@@ -58,3 +58,23 @@ The static output is `dist/client`. The local static preview is at `http://127.0
 The Give-AI Visit project URL is `https://giveai.shipuntildead.com`. Connect that subdomain to the separate Give-AI application at its host; this portfolio does not contain or deploy that app.
 
 See [README-HOSTINGER.md](README-HOSTINGER.md) for manual ZIP upload and local packaging instructions.
+
+## Hostinger app-build setup (including the missing package.json error)
+
+The `hostinger` branch also supports Hostinger's **Deploy Web App** importer. It includes a dependency-free package manifest, a build command, and a small server for this path. GitHub generates these files on every build, so they are not lost when the branch updates.
+
+Use these settings for that importer:
+
+| Setting | Value |
+| --- | --- |
+| Branch | `hostinger` |
+| Framework | **Other** |
+| Root directory | Repository root (`.`) |
+| Node version | **22** |
+| Build command | `npm run build` |
+| Output directory | `dist` |
+| Start command, if requested | `npm start` |
+| Entry file, if requested | `server.cjs` |
+
+Then redeploy the latest commit. The build packages the already-generated website; it does not need to install React or run Vite on Hostinger. The server listens on Hostinger's assigned port and all network interfaces. Static PHP/HTML Git deployment remains supported by the same branch.
+
