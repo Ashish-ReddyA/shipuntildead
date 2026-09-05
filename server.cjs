@@ -4,8 +4,8 @@ const { existsSync } = require('node:fs');
 const path = require('node:path');
 const output = path.join(__dirname, 'dist');
 const root = existsSync(path.join(output, 'index.html')) ? output : __dirname;
-const types = { '.html':'text/html; charset=utf-8', '.css':'text/css', '.js':'text/javascript', '.json':'application/json', '.rsc':'text/x-component', '.jpg':'image/jpeg', '.webp':'image/webp', '.png':'image/png', '.svg':'image/svg+xml', '.woff2':'font/woff2', '.ico':'image/x-icon' };
-const allowed = new Set(['index.html','404.html','index.rsc','favicon.svg','vinext-client-entry-manifest.json','images','projects','_next']);
+const types = { '.txt':'text/plain; charset=utf-8', '.xml':'application/xml; charset=utf-8', '.html':'text/html; charset=utf-8', '.css':'text/css', '.js':'text/javascript', '.json':'application/json', '.rsc':'text/x-component', '.jpg':'image/jpeg', '.webp':'image/webp', '.png':'image/png', '.svg':'image/svg+xml', '.woff2':'font/woff2', '.ico':'image/x-icon' };
+const allowed = new Set(['index.html','404.html','index.rsc','favicon.svg','favicon-96.png','apple-touch-icon.png','robots.txt','sitemap.xml','vinext-client-entry-manifest.json','images','projects','_next']);
 const server = http.createServer(async (req,res) => {
   if (!['GET','HEAD'].includes(req.method)) { res.writeHead(405, {Allow:'GET, HEAD'}); return res.end(); }
   try {
